@@ -27,7 +27,8 @@ def getEndIndex (arg):
 	allOpens = [x for x in allOpens if x not in allOpenEscapes and x < lastClosed]
 	if len(allOpens) > len(allClosed):
 		return None
-	return allClosed[len(allOpens) - 1]
+
+	return allClosed[len(allOpens)]
 
 def getEndOfName (arg):
 	stringSequence = re.search('\W', arg)
@@ -101,7 +102,7 @@ def getValueFromPairs (key):
 	try:
 		return tokenPairs[key]	
 	except KeyError:
-		return ""
+		return None
 
 def getAllArgs ():
 	buildString = ""
@@ -111,7 +112,7 @@ def getAllArgs ():
 	return unpackString(buildString[:-1])
 
 def expandBracketEnclosed (arg):
-	endIndex = getEndIndex(arg)
+	endIndex = getEndIndex(arg[1:]) + 1
 	if (ord(arg[1]) < 58 and ord(arg[1]) > 47):
 		if (endIndex > 2):
 			return None
@@ -125,15 +126,17 @@ def expandBracketEnclosed (arg):
 	if (len(seperateByDash[0]) < len(seperateByEqu[0])):
 		name = seperateByDash[0]
 		dashIndex = sequence.index("-") + 1
+		word = sequence[dashIndex:endIndex]
 		value = getValueFromPairs(name)
-		if value != "":
+		if value != None:
 			return {"expanded":value,"spanIndex":endIndex + 2}
-		expanded = unpackString(word)
-		return {"expanded":expanded,"spanIndex":endIndex + 2}
+			expanded = unpackString(word)
+			return {"expanded":expanded,"spanIndex":endIndex + 2}
+		return {"expanded":"","spanIndex":endIndex + 2}
 	else:
 		name = seperateByEqu[0]
-		dashIndex = sequence.index("=") + 1
-		word = sequence[dashIndex:endIndex]
+		equIndex = sequence.index("=") + 1
+		word = sequence[equIndex:endIndex]
 		expanded = unpackString(word)
 		tokenPairs[name] = unpackString(word)
 		return {"expanded":expanded,"spanIndex":endIndex +2}
@@ -182,6 +185,7 @@ def test ():
 		line = sys.stdin.readline()
 
 		if line is None:
+			print("")
 			break
 		lineBuild = unpackString(line)
 		if (lineBuild != None):
