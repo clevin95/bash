@@ -1,6 +1,7 @@
 #!/usr/bin/bash/python
 import sys
 import os
+import re
 
 tokenPairs = os.environ	
 
@@ -29,26 +30,33 @@ def getEndIndex (arg):
 	return allClosed[len(allOpens) - 1]
 
 def getEndOfName (arg):
-	allSpaces = [i for i in range(len(arg)) if arg.startswith(' ', i)]
-	allSpacesEscapes = [i + 1 for i in range(len(arg)) if arg.startswith('\ ', i)]
+	stringSequence = re.search('\W', arg)
+	if stringSequence == None:
+		return len(arg)
+	else:
+		return arg.index(stringSequence.group(0))
+	# return len(stringSequence)
 
-	allDollar = [i for i in range(len(arg)) if arg.startswith('$', i)]
-	allDollarEscapes = [i + 1 for i in range(len(arg)) if arg.startswith('\$', i)]
+	# allSpaces = [i for i in range(len(arg)) if arg.startswith(' ', i)]
+	# allSpacesEscapes = [i + 1 for i in range(len(arg)) if arg.startswith('\ ', i)]
 
-	allSpaces = [x for x in allSpaces if x not in allSpacesEscapes]
-	allDollar = [x for x in allDollar if x not in allDollarEscapes]
-	try:
-		firstSpace = allSpaces = allSpaces[0]
-	except IndexError:
-		firstSpace = len(arg)
-	try:
-		firstDollar = allDollar[0]
-	except IndexError:
-		firstDollar = len(arg)
-	if firstSpace < firstDollar:
-		return firstSpace
-	if firstDollar <= firstSpace:
-		return firstDollar
+	# allDollar = [i for i in range(len(arg)) if arg.startswith('$', i)]
+	# allDollarEscapes = [i + 1 for i in range(len(arg)) if arg.startswith('\$', i)]
+
+	# allSpaces = [x for x in allSpaces if x not in allSpacesEscapes]
+	# allDollar = [x for x in allDollar if x not in allDollarEscapes]
+	# try:
+	# 	firstSpace = allSpaces = allSpaces[0]
+	# except IndexError:
+	# 	firstSpace = len(arg)
+	# try:
+	# 	firstDollar = allDollar[0]
+	# except IndexError:
+	# 	firstDollar = len(arg)
+	# if firstSpace < firstDollar:
+	# 	return firstSpace
+	# if firstDollar <= firstSpace:
+	# 	return firstDollar
 
 def getEndIndexForAnd (arg, startIndex):
 	if "$" in arg[startIndex:]:
@@ -172,6 +180,9 @@ def test ():
 		prompt = "(" + str(count) + ")$ "
 		sys.stdout.write(prompt)
 		line = sys.stdin.readline()
+
+		if line is None:
+			break
 		lineBuild = unpackString(line)
 		if (lineBuild != None):
 			print(">> " + lineBuild)
