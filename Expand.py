@@ -1,4 +1,4 @@
-#!/usr/bin/bash/python
+#!/usr/bin/python
 import sys
 import os
 import re
@@ -25,10 +25,15 @@ def getEndIndex (arg):
 	allClosed = [x for x in allClosed if x not in allClosedEscapes]
 	lastClosed = allClosed[-1]
 	allOpens = [x for x in allOpens if x not in allOpenEscapes and x < lastClosed]
-	if len(allOpens) > len(allClosed):
-		return None
 
-	return allClosed[len(allOpens)]
+	for closeIndex in allClosed:
+		isLess = True
+		for openIndex in allOpens:
+			if openIndex < closeIndex:
+				isLess = False
+		if (isLess):
+			return closeIndex
+	return None
 
 def getEndOfName (arg):
 	stringSequence = re.search('\W', arg)
@@ -112,7 +117,11 @@ def getAllArgs ():
 	return unpackString(buildString[:-1])
 
 def expandBracketEnclosed (arg):
-	endIndex = getEndIndex(arg[1:]) + 1
+	endIndex = getEndIndex(arg[1:])
+	if (endIndex is None):
+		return None
+	else:
+		endIndex += 1
 	if (ord(arg[1]) < 58 and ord(arg[1]) > 47):
 		if (endIndex > 2):
 			return None
@@ -184,7 +193,7 @@ def test ():
 		sys.stdout.write(prompt)
 		line = sys.stdin.readline()
 
-		if line is None:
+		if line == '':
 			print("")
 			break
 		lineBuild = unpackString(line)
