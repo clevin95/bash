@@ -44,8 +44,6 @@ def getEndOfName (arg):
 		return arg.index(stringSequence.group(0))
 
 def getEndIndexForAnd (arg, startIndex):
-
-
 	if "$" in arg[startIndex:]:
 		endIndex = arg[startIndex:].index("$")
 		if "\$" in arg[startIndex:]:
@@ -61,21 +59,9 @@ def getEndIndexForAnd (arg, startIndex):
 
 def isValidName (name):
 	if "$" in name or " " in name or "}" in name or "{" in name:
-		nextIndex = len(name)
-		invalids = " {}$"
-		for invalid in invalids:
-			try:
-				foundIndex = name.index(invalid)
-				if foundIndex < nextIndex:
-					nextIndex = foundIndex
-			except ValueError:
-				continue
-		if (nextIndex > 0):
-			if name[nextIndex - 1] == '\\':
-				return isValidName (name[nextIndex + 1:])
+		return False
 	else:
 		return True
-	return False
 
 def getValueFromArgs (number):
 	try:
@@ -112,7 +98,10 @@ def expandBracketEnclosed (arg):
 	seperateByEqu = sequence.split('=')
 	seperateByDash = sequence.split('-')
 	if len(seperateByDash) == 1 and len(seperateByEqu) == 1:
-		return {"expanded":getValueFromPairs(sequence),"spanIndex":endIndex + 2}
+		value = getValueFromPairs(sequence)
+		if value != None: 
+			return {"expanded":getValueFromPairs(sequence),"spanIndex":endIndex + 2}
+		return {"expanded":"","spanIndex":endIndex + 2}
 	if (len(seperateByDash[0]) < len(seperateByEqu[0])):
 		name = seperateByDash[0]
 		dashIndex = sequence.index("-") + 1
@@ -146,7 +135,9 @@ def expand (arg):
 	else:
 		endIndex = getEndOfName (arg[1:]) + 1
 		expanded = getValueFromPairs(arg[1:endIndex])
-		return {"expanded":expanded,"spanIndex":endIndex}
+		if expanded != None:
+			return {"expanded":expanded,"spanIndex":endIndex}
+		return {"expanded":"","spanIndex":endIndex}
 
 def unpackString (line):
 	line = line.replace('\n','')
