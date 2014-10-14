@@ -5,13 +5,15 @@ import re
 
 tokenPairs = os.environ	
 
-def containsSymbol (arg,symbol):
-	allOpens = [i for i in range(len(arg)) if arg.startswith(symbol, i)]
-	allEscapes = [i + 1 for i in range(len(arg)) if arg.startswith('\\' + symbol, i)]
-	for index in allOpens:
-		if index not in allEscapes:
-			return index
-	return None
+def containsDollar (arg):
+	while "\\\\" in arg:
+		arg = arg.replace("\\\\","``",1)
+	while "\$" in arg:
+		arg = arg.replace("\$","``",1)
+	if "$" in arg:
+		return arg.index("$")
+	else:
+		return None
 
 def getEndIndex (arg):
 	while "\\\\" in arg:
@@ -42,12 +44,18 @@ def getEndOfName (arg):
 		return arg.index(stringSequence.group(0))
 
 def getEndIndexForAnd (arg, startIndex):
-	while "\\\\" in arg:
-		arg = arg.replace("\\\\","``",1)
-	while "\$" in arg:
-		arg = arg.replace("\{","``",1)
+
+
 	if "$" in arg[startIndex:]:
-		return arg.index("$")
+		endIndex = arg[startIndex:].index("$")
+		if "\$" in arg[startIndex:]:
+			escapeIndex = arg[startIndex:].index("\$")
+			if endIndex == escapeIndex + 1:
+				return getEndIndexForAnd(arg, startIndex + endIndex + 1)
+			else:
+				return endIndex + startIndex
+		else:
+			return endIndex + startIndex
 	else:
 		return None
 
@@ -145,7 +153,7 @@ def unpackString (line):
 	lineBuild = ""
 	currentIndex = 0;
 	while (currentIndex != len(line)):
-		repIndex = containsSymbol(line[currentIndex:], '$')
+		repIndex = containsDollar(line[currentIndex:])
 		if  repIndex!= None:
 			lineBuild += line[currentIndex:currentIndex + repIndex]
 			values = expand(line[currentIndex + repIndex:])
