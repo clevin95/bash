@@ -14,25 +14,24 @@ def containsSymbol (arg,symbol):
 	return None
 
 def getEndIndex (arg):
-	allOpens = [i for i in range(len(arg)) if arg.startswith('{', i)]
-	allOpenEscapes = [i + 1 for i in range(len(arg)) if arg.startswith('\{', i)]
-
-	allClosed = [i for i in range(len(arg)) if arg.startswith('}', i)]
-	allClosedEscapes = [i + 1 for i in range(len(arg)) if arg.startswith('\}', i)]
-
-	if len(allClosed) == 0:
-		return None
-	allClosed = [x for x in allClosed if x not in allClosedEscapes]
-	lastClosed = allClosed[-1]
-	allOpens = [x for x in allOpens if x not in allOpenEscapes and x < lastClosed]
-
-	for closeIndex in allClosed:
-		isLess = True
-		for openIndex in allOpens:
-			if openIndex < closeIndex:
-				isLess = False
-		if (isLess):
-			return closeIndex
+	while "\\\\" in arg:
+		arg = arg.replace("\\\\","``",1)
+	while "\{" in arg:
+		arg = arg.replace("\{","``",1)
+	while "\}" in arg:
+		arg = arg.replace("\}","``",1)
+	
+	bracketCounter = 1
+	indexCounter = 0 
+	for char in arg:
+		if char == '{':
+			bracketCounter += 1
+		else:
+		 if char == '}':
+			bracketCounter -= 1
+		if bracketCounter == 0:
+			return indexCounter;
+		indexCounter += 1
 	return None
 
 def getEndOfName (arg):
@@ -41,28 +40,6 @@ def getEndOfName (arg):
 		return len(arg)
 	else:
 		return arg.index(stringSequence.group(0))
-	# return len(stringSequence)
-
-	# allSpaces = [i for i in range(len(arg)) if arg.startswith(' ', i)]
-	# allSpacesEscapes = [i + 1 for i in range(len(arg)) if arg.startswith('\ ', i)]
-
-	# allDollar = [i for i in range(len(arg)) if arg.startswith('$', i)]
-	# allDollarEscapes = [i + 1 for i in range(len(arg)) if arg.startswith('\$', i)]
-
-	# allSpaces = [x for x in allSpaces if x not in allSpacesEscapes]
-	# allDollar = [x for x in allDollar if x not in allDollarEscapes]
-	# try:
-	# 	firstSpace = allSpaces = allSpaces[0]
-	# except IndexError:
-	# 	firstSpace = len(arg)
-	# try:
-	# 	firstDollar = allDollar[0]
-	# except IndexError:
-	# 	firstDollar = len(arg)
-	# if firstSpace < firstDollar:
-	# 	return firstSpace
-	# if firstDollar <= firstSpace:
-	# 	return firstDollar
 
 def getEndIndexForAnd (arg, startIndex):
 	if "$" in arg[startIndex:]:
