@@ -118,10 +118,10 @@ def expandBracketEnclosed (arg):
 		word = sequence[equIndex:endIndex]
 		expanded = unpackString(word)
 		value = getValueFromPairs(name)
-		tokenPairs[name] = unpackString(word)
-		if value != none:
+		if value != None:
 			return {"expanded":value,"spanIndex":endIndex +2}
 		else:
+			tokenPairs[name] = unpackString(word)
 			return {"expanded":expanded,"spanIndex":endIndex +2}
 
 		
