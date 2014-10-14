@@ -42,16 +42,12 @@ def getEndOfName (arg):
 		return arg.index(stringSequence.group(0))
 
 def getEndIndexForAnd (arg, startIndex):
+	while "\\\\" in arg:
+		arg = arg.replace("\\\\","``",1)
+	while "\$" in arg:
+		arg = arg.replace("\{","``",1)
 	if "$" in arg[startIndex:]:
-		endIndex = arg[startIndex:].index("$")
-		if "\$" in arg[startIndex:]:
-			escapeIndex = arg[startIndex:].index("\$")
-			if endIndex == escapeIndex + 1:
-				return getEndIndexForAnd(arg, startIndex + endIndex + 1)
-			else:
-				return endIndex + startIndex
-		else:
-			return endIndex + startIndex
+		return arg.index("$")
 	else:
 		return None
 
