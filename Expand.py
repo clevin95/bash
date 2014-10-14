@@ -117,8 +117,14 @@ def expandBracketEnclosed (arg):
 		equIndex = sequence.index("=") + 1
 		word = sequence[equIndex:endIndex]
 		expanded = unpackString(word)
+		value = getValueFromPairs(name)
 		tokenPairs[name] = unpackString(word)
-		return {"expanded":expanded,"spanIndex":endIndex +2}
+		if value != none:
+			return {"expanded":value,"spanIndex":endIndex +2}
+		else:
+			return {"expanded":expanded,"spanIndex":endIndex +2}
+
+		
 
 def expand (arg):
 	if (len(arg) == 1):
@@ -164,15 +170,16 @@ def test ():
 		prompt = "(" + str(count) + ")$ "
 		sys.stdout.write(prompt)
 		line = sys.stdin.readline()
+		if line != '\n':
+			if line == '':
+				print("")
+				break
+			lineBuild = unpackString(line)
+			if (lineBuild != None):
+				print(">> " + lineBuild)
+				count += 1
+			else:
+				sys.stderr.write('Invalid name\n')
 
-		if line == '':
-			print("")
-			break
-		lineBuild = unpackString(line)
-		if (lineBuild != None):
-			print(">> " + lineBuild)
-			count += 1
-		else:
-			sys.stderr.write('Invalid name\n')
 
 test()
