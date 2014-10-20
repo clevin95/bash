@@ -115,7 +115,8 @@ def expandBracketEnclosed (arg):
 			return {"expanded":value,"spanIndex":endIndex + 2}
 			expanded = unpackString(word)
 			return {"expanded":expanded,"spanIndex":endIndex + 2}
-		return {"expanded":"","spanIndex":endIndex + 2}
+		expanded = unpackString(word)
+		return {"expanded":expanded,"spanIndex":endIndex + 2}
 	else:
 		name = seperateByEqu[0]
 		if isValidName(name) == False:
