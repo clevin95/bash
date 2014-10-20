@@ -22,7 +22,6 @@ def getEndIndex (arg):
 		arg = arg.replace("\{","``",1)
 	while "\}" in arg:
 		arg = arg.replace("\}","``",1)
-	
 	bracketCounter = 1
 	indexCounter = 0 
 	for char in arg:
@@ -98,12 +97,17 @@ def expandBracketEnclosed (arg):
 	seperateByEqu = sequence.split('=')
 	seperateByDash = sequence.split('-')
 	if len(seperateByDash) == 1 and len(seperateByEqu) == 1:
+		if isValidName(sequence) == False:
+			return None
 		value = getValueFromPairs(sequence)
 		if value != None: 
 			return {"expanded":getValueFromPairs(sequence),"spanIndex":endIndex + 2}
 		return {"expanded":"","spanIndex":endIndex + 2}
 	if (len(seperateByDash[0]) < len(seperateByEqu[0])):
 		name = seperateByDash[0]
+		if isValidName(name) == False:
+			print(name)
+			return None
 		dashIndex = sequence.index("-") + 1
 		word = sequence[dashIndex:endIndex]
 		value = getValueFromPairs(name)
@@ -114,17 +118,20 @@ def expandBracketEnclosed (arg):
 		return {"expanded":"","spanIndex":endIndex + 2}
 	else:
 		name = seperateByEqu[0]
+		if isValidName(name) == False:
+			print(name)
+			return None
+		# valueBefor = getValueFromPairs(name)
 		equIndex = sequence.index("=") + 1
 		word = sequence[equIndex:endIndex]
-		expanded = unpackString(word)
+		# expanded = unpackString(word)
 		value = getValueFromPairs(name)
 		if value != None:
 			return {"expanded":value,"spanIndex":endIndex +2}
 		else:
-			tokenPairs[name] = unpackString(word)
+			expanded = unpackString(word)
+			tokenPairs[name] = expanded
 			return {"expanded":expanded,"spanIndex":endIndex +2}
-
-		
 
 def expand (arg):
 	if (len(arg) == 1):
